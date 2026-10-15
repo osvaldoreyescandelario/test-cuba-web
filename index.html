@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuánto sabes de Cuba?</title>
+<style>
+:root{--verde:#123c32;--dorado:#f0c66b;--texto:#24332d}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(145deg,#d9e8df,#f8f1df);color:var(--texto);min-height:100vh}
+header{background:var(--verde);color:white;text-align:center;padding:18px;border-bottom:4px solid var(--dorado);font-weight:bold;letter-spacing:2px}
+main{width:min(720px,94%);margin:25px auto}
+.card{background:white;border-radius:18px;padding:clamp(20px,5vw,36px);box-shadow:0 10px 35px #173b2d20}
+.hero{text-align:center;background:var(--verde);color:white;border-radius:14px;padding:25px 15px;margin-bottom:22px}
+.hero p{color:#e5eee8}
+.flag{font-size:46px}
+h1{font-size:clamp(27px,5vw,38px);margin:12px 0}
+h2{line-height:1.4}
+p{line-height:1.6}
+button,.button{display:block;width:100%;border:0;border-radius:10px;padding:14px 16px;font-size:16px;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none}
+.primary{background:var(--verde);color:white}
+.gold{background:var(--dorado);color:#2d2a20}
+.secondary{background:#edf2ee;color:var(--verde);margin-top:10px}
+.hidden{display:none!important}
+.progress-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px}
+.progress{height:9px;background:#e6ebe7;border-radius:20px;overflow:hidden;margin-bottom:24px}
+#bar{height:100%;width:0;background:#27805e;transition:width .2s}
+.answers{display:grid;gap:12px;margin:24px 0}
+.answer{display:flex;align-items:center;gap:12px;border:2px solid #dfe6e0;border-radius:12px;padding:15px;cursor:pointer;line-height:1.4}
+.answer:has(input:checked){border-color:#287555;background:#edf7f0}
+.answer input{width:19px;height:19px;accent-color:#287555;flex-shrink:0}
+.notice{border-left:4px solid var(--dorado);background:#fff8e8;padding:12px 15px;font-size:14px;line-height:1.5;margin:18px 0}
+.score{font-size:58px;font-weight:800;color:var(--verde);text-align:center;margin:15px 0}
+.result-label{background:#f8efd8;border-radius:12px;text-align:center;padding:18px}
+footer{text-align:center;padding:15px;color:#586960;font-size:13px}
+</style>
+</head>
+<body>
+<header>🇨🇺 DESCUBRE CUBA</header>
+<main>
+<section id="intro" class="card">
+<div class="hero"><div class="flag">🇨🇺</div><h1>¿Cuánto sabes realmente de Cuba?</h1><p>Descubre curiosidades de la naturaleza, la historia y los logros de Cuba.</p></div>
+<p><strong>10 preguntas · 10 puntos posibles</strong></p>
+<p>Responde las diez preguntas y descubre tu nivel de conocimientos.</p>
+<button class="primary" id="start">COMENZAR EL TEST</button>
+</section>
+
+<section id="quiz" class="card hidden">
+<div class="progress-row"><span id="counter"></span><span id="percent"></span></div>
+<div class="progress"><div id="bar"></div></div>
+<h2 id="question"></h2>
+<div id="answers" class="answers"></div>
+<button id="next" class="primary">SIGUIENTE</button>
+<button id="back" class="secondary">PREGUNTA ANTERIOR</button>
+<p id="warning" role="status"></p>
+</section>
+
+<section id="follow" class="card hidden">
+<div class="hero"><div class="flag">🎉</div><h1>¡Has terminado!</h1><p>Tu resultado está preparado.</p></div>
+<h2>Sigue nuestra página de Facebook</h2>
+<p>Visítanos para descubrir más preguntas, historias y curiosidades sobre Cuba.</p>
+<a id="followLink" class="button gold" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">👍 VISITAR FACEBOOK</a>
+<div class="notice">Después de visitar Facebook, vuelve aquí y pulsa «Ver mi resultado». Este test no puede comprobar si realmente has seguido la página.</div>
+<button id="showResult" class="primary">🔓 VER MI RESULTADO</button>
+</section>
+
+<section id="result" class="card hidden">
+<div class="hero"><div class="flag" id="resultEmoji">🏆</div><h1>Tu resultado</h1><p>¿Cuánto sabes realmente de Cuba?</p></div>
+<div class="score"><span id="score">0</span><span style="font-size:25px"> / 10</span></div>
+<div class="result-label"><h2 id="level"></h2><p id="message"></p></div>
+<p id="percentResult" style="text-align:center"></p>
+<button id="share" class="primary">COMPARTIR MI RESULTADO</button>
+<button id="restart" class="secondary">VOLVER A JUGAR</button>
+</section>
+</main>
+<footer>Un reto de conocimientos sobre Cuba 🇨🇺</footer>
+
+<script>
+const FACEBOOK_PAGE_URL = "https://www.facebook.com/";
+
+const questions = [
+{q:"El zunzuncito, ave endémica de Cuba, es el ave más pequeña del mundo.",a:["Verdadero","Falso"],c:0},
+{q:"La ranita pigmeo cubana es:",a:["La más pequeña del mundo","La cuarta más pequeña del mundo","La segunda más pequeña del mundo"],c:0},
+{q:"El murciélago mariposa cubano es considerado:",a:["El segundo murciélago más pequeño del mundo","El más grande de los murciélagos cubanos","El cuarto murciélago más pequeño del mundo"],c:0},
+{q:"La palma corcho (Microcycas calocoma) es una especie endémica de Cuba.",a:["Verdadero","Falso"],c:0},
+{q:"Cuba es:",a:["Una isla","Un continente","Un archipiélago"],c:2},
+{q:"¿Qué país fue el primero de América Latina en tener un ferrocarril?",a:["México","Cuba","Brasil"],c:1},
+{q:"En 1958, Cuba comenzó a transmitir televisión en color, convirtiéndose en el:",a:["Primer país del mundo en hacerlo","Segundo país del mundo en hacerlo","Tercer país del mundo en hacerlo"],c:1},
+{q:"El primer sistema de alumbrado eléctrico público de Iberoamérica se instaló en:",a:["Cuba","España","México"],c:0},
+{q:"La primera ciudad del mundo en disponer de telefonía con discado directo fue:",a:["Nueva York","Madrid","La Habana"],c:2},
+{q:"El primer país del mundo que construyó un hotel con aire acondicionado central fue Cuba.",a:["Verdadero","Falso"],c:0}
+];
+
+let current=0;
+let selections=Array(questions.length).fill(null);
+let finalScore=0;
+const $=id=>document.getElementById(id);
+const screens=["intro","quiz","follow","result"];
+
+function showScreen(id){
+ screens.forEach(s=>$(s).classList.toggle("hidden",s!==id));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderQuestion(){
+ const item=questions[current];
+ $("counter").textContent=`Pregunta ${current+1} de ${questions.length}`;
+ $("percent").textContent=`${Math.round((current+1)/questions.length*100)} %`;
+ $("bar").style.width=`${(current+1)/questions.length*100}%`;
+ $("question").textContent=item.q;
+ $("answers").replaceChildren();
+ $("warning").textContent="";
+ item.a.forEach((answer,index)=>{
+  const label=document.createElement("label");
+  label.className="answer";
+  const radio=document.createElement("input");
+  radio.type="radio";radio.name="answer";radio.value=index;
+  radio.checked=selections[current]===index;
+  radio.addEventListener("change",()=>{
+   selections[current]=index;$("warning").textContent="";
+  });
+  const span=document.createElement("span");span.textContent=answer;
+  label.append(radio,span);$("answers").append(label);
+ });
+ $("back").classList.toggle("hidden",current===0);
+ $("next").textContent=current===questions.length-1?"TERMINAR TEST":"SIGUIENTE";
+}
+function calculateScore(){
+ return questions.reduce((total,item,index)=>total+(selections[index]===item.c?1:0),0);
+}
+$("start").addEventListener("click",()=>{
+ current=0;renderQuestion();showScreen("quiz");
+});
+$("next").addEventListener("click",()=>{
+ if(selections[current]===null){
+  $("warning").textContent="Selecciona una respuesta para continuar.";return;
+ }
+ if(current<questions.length-1){current++;renderQuestion();}
+ else{
+  finalScore=calculateScore();
+  $("followLink").href=FACEBOOK_PAGE_URL;
+  showScreen("follow");
+ }
+});
+$("back").addEventListener("click",()=>{
+ if(current>0){current--;renderQuestion();}
+});
+$("showResult").addEventListener("click",()=>{
+ finalScore=calculateScore();
+ $("score").textContent=finalScore;
+ $("percentResult").textContent=`Has acertado el ${finalScore*10} % de las preguntas.`;
+ let emoji,level,message;
+ if(finalScore<=3){
+  emoji="🌱";level="Aprendiz de Cuba";
+  message="Todavía tienes mucho por descubrir sobre la naturaleza, la historia y las curiosidades de Cuba.";
+ }else if(finalScore<=6){
+  emoji="🌴";level="Buen conocedor de Cuba";
+  message="¡Nada mal! Conoces varias curiosidades, pero aún quedan secretos por descubrir.";
+ }else if(finalScore<=8){
+  emoji="⭐";level="Gran conocedor de Cuba";
+  message="¡Muy buen resultado! Tienes buenos conocimientos sobre Cuba.";
+ }else{
+  emoji="🏆";level="Experto en Cuba";
+  message="¡Impresionante! Has demostrado un gran conocimiento en este reto.";
+ }
+ $("resultEmoji").textContent=emoji;
+ $("level").textContent=level;$("message").textContent=message;
+ showScreen("result");
+});
+$("share").addEventListener("click",async()=>{
+ const shareText=`¡Conseguí ${finalScore}/10 en el test «¿Cuánto sabes realmente de Cuba?» 🇨🇺 ¿Puedes superarme?`;
+ const shareData={title:"¿Cuánto sabes realmente de Cuba?",text:shareText,url:window.location.href};
+ try{
+  if(navigator.share){await navigator.share(shareData);}
+  else{
+   const fbUrl="https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(window.location.href);
+   window.open(fbUrl,"_blank","noopener,noreferrer");
+  }
+ }catch(error){
+  if(error.name!=="AbortError"){
+   alert("No se pudo abrir la opción para compartir. Copia el enlace de esta página y publícalo en Facebook.");
+  }
+ }
+});
+$("restart").addEventListener("click",()=>{
+ current=0;selections=Array(questions.length).fill(null);finalScore=0;
+ renderQuestion();showScreen("intro");
+});
+</script>
+</body>
+</html>
